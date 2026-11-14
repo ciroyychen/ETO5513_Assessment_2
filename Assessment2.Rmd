@@ -23,8 +23,7 @@ pacman::p_load(readr,dplyr,ggplot2,tidyverse,knitr,kableExtra,scales,WDI)
 ### Section 2
 
 
-```{r cars}
-summary(cars)
+```{r s2_child, child="section2_annikashah.Rmd"}
 ```
 
 ### Section 3
