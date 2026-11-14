@@ -1,0 +1,43 @@
+---
+title: "ETO5513_Assessment2"
+author: "Group project - Mirna Bakri, Annika Shah, James Costabile, Yuyao Chen"
+date: "2026-11-14"
+output: 
+  html_document:
+    theme: flatly
+    toc: false
+---
+## Introduction
+
+## Analysis sections
+
+### Section 1
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,fig.align = "center")
+
+# Loading libraries
+pacman::p_load(readr,dplyr,ggplot2,tidyverse,knitr,kableExtra,scales,WDI)
+```
+
+### Section 2
+
+
+```{r cars}
+summary(cars)
+```
+
+### Section 3
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+### Section 4
+
+
+
+
+## Conclusion
+
+## Reference {-}
