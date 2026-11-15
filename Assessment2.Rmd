@@ -22,13 +22,89 @@ pacman::p_load(readr,dplyr,ggplot2,tidyverse,knitr,kableExtra,scales,WDI)
 
 ### Section 2
 
+```{r s2_data, echo=FALSE}
+raw <- readRDS("data/wdi_section2.rds") %>%
+  mutate(region = recode(region,
+    "Middle East, North Africa, Afghanistan & Pakistan" = "MENA, Afghanistan & Pakistan"))
+
+growth <- raw %>%
+  filter(!is.na(g_b40), !is.na(g_all)) %>%
+  group_by(country) %>% slice_max(year, n = 1) %>% ungroup() %>%
+  mutate(gap = g_b40 - g_all)
+
+level <- raw %>%
+  filter(!is.na(b40), !is.na(gdp_pc), b40 > 0, gdp_pc > 0) %>%
+  group_by(country) %>% slice_max(year, n = 1) %>% ungroup()
+
+n_g       <- nrow(growth)
+pct_above <- round(mean(growth$gap > 0) * 100)
+med_gap   <- round(median(growth$gap), 1)
+mean_b40  <- round(mean(growth$g_b40), 2)
+mean_all  <- round(mean(growth$g_all), 2)
+n_l       <- nrow(level)
+r_l       <- round(cor(log(level$gdp_pc), log(level$b40)), 2)
+```
+
 #### Research question 1: Is bottom-40% income growth keeping pace with total growth?
 
-(text and Figure 1 / Table 1 will go here)
+Figure 1 compares annualised income growth for the bottom 40% with growth for the total population across `r n_g` countries (latest comparable survey period). In `r pct_above`% of countries the bottom 40% grew faster, and the median gap was `r med_gap` percentage points. Average growth was `r mean_b40`% per year for the bottom 40% against `r mean_all`% for everyone, so the poorest are keeping pace and slightly more. However, in the remaining `r 100 - pct_above`% the poor fell behind. Most points lie near the dashed line, consistent with evidence that growth is generally good for the poor (Dollar & Kraay, 2002). 
+
+```{r s2_fig1, echo=FALSE, fig.cap="Annualised growth of the bottom 40% versus the total population (latest survey period per country). Points above the dashed line mean the bottom 40% grew faster.", fig.height=4}
+ggplot(growth, aes(g_all, g_b40)) +
+  geom_abline(linetype = "dashed") +
+  geom_point(aes(colour = region), alpha = 0.8) +
+  labs(x = "Growth, total population (% per year)",
+       y = "Growth, bottom 40% (% per year)", colour = "Region") +
+  theme_minimal(base_size = 9) +
+  theme(legend.position = "bottom") +
+  guides(colour = guide_legend(nrow = 3))
+```
+
+
+```{r s2_tab1, echo=FALSE}
+growth %>%
+  group_by(Region = region) %>%
+  summarise(n = n(),
+            `Bottom 40%` = round(mean(g_b40), 2),
+            Total = round(mean(g_all), 2),
+            Gap = round(mean(gap), 2),
+            `% bottom 40% faster` = round(mean(gap > 0) * 100)) %>%
+  kable(caption = "Mean annualised growth (%) by region")
+```
+
+Table 1 shows the gap is largest in East Asia & Pacific (1.40 points) and negative only in the Middle East, North Africa, Afghanistan & Pakistan (-0.45 points; faster bottom-40% growth in just 22% of countries). Sub-Saharan Africa's gap (1.05 points) accompanies low overall growth (0.47%), so relative gains were not large absolute progress.
 
 #### Research question 2: Do higher-income countries have higher bottom-40% incomes?
 
-(text and Figure 2 / Table 2 will go here)
+Figure 2 plots bottom-40% income against GDP per capita for `r n_l` countries on log scales. The relationship is very strong (correlation `r r_l` on logged values): countries with higher national income also have higher incomes for their poorest 40% (Milanović, 2016). 
+
+```{r s2_fig2, echo=FALSE, fig.cap="Bottom-40% income versus GDP per capita (log scales, latest observation per country).", fig.height=4}
+ggplot(level, aes(gdp_pc, b40)) +
+  geom_point(aes(colour = region), alpha = 0.8) +
+  geom_smooth(method = "lm", se = FALSE, colour = "black", linewidth = 0.6) +
+  scale_x_log10(labels = scales::dollar) +
+  scale_y_log10(labels = scales::dollar) +
+  labs(x = "GDP per capita (current US$)",
+       y = "Bottom-40% income (2021 PPP $/day)", colour = "Region") +
+  theme_minimal(base_size = 9) +
+  theme(legend.position = "bottom") +
+  guides(colour = guide_legend(nrow = 3))
+
+```
+
+```{r s2_tab2, echo=FALSE}
+level %>%
+  filter(!is.na(income), income != "Not classified") %>%
+  mutate(income = factor(income, levels = c("Low income", "Lower middle income",
+                                            "Upper middle income", "High income"))) %>%
+  group_by(`Income group` = income) %>%
+  summarise(n = n(),
+            `Median GDP per capita (USD)` = round(median(gdp_pc)),
+            `Median bottom-40% income (USD per day)` = round(median(b40), 1)) %>%
+  kable(caption = "Median GDP per capita and bottom-40% income by income group")
+```
+
+Table 2 shows the same pattern by income group, with median bottom-40% income rising from \$2.0 per day in low-income countries to \$27.1 in high-income countries, while median GDP per capita rises from \$846 to \$37,518. This is an association rather than evidence that growth alone improves the poor, and the measures are not independent, since the bottom 40% form part of the national total. 
 
 
 
@@ -46,3 +122,8 @@ plot(pressure)
 ## Conclusion
 
 ## Reference {-}
+
+
+Dollar, D., & Kraay, A. (2002). Growth Is Good for the Poor. Journal of Economic Growth (Boston, Mass.), 7(3), 195–225. https://doi.org/10.1023/a:1020139631000 
+
+Milanović, B. (2016). *Global inequality: A new approach for the age of globalization*. Belknap Press of Harvard University Press. https://doi.org/10.2307/j.ctvjghwk4
