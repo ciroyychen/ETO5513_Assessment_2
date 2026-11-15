@@ -107,6 +107,38 @@ level %>%
 Table 2 shows the same pattern by income group, with median bottom-40% income rising from \$2.0 per day in low-income countries to \$27.1 in high-income countries, while median GDP per capita rises from \$846 to \$37,518. This is an association rather than evidence that growth alone improves the poor, and the measures are not independent, since the bottom 40% form part of the national total. 
 
 
+```{r s2_data_source, eval=FALSE, echo=FALSE}
+# How data/wdi_section2.rds was created (run once; not run when knitting).
+# Source: World Bank World Development Indicators via the WDI package,
+# downloaded 15 November 2026. The saved file is committed to the repo so
+# the report knits without an internet connection.
+library(WDI)
+library(dplyr)
+
+options(timeout = 300)  # the World Bank API can be slow
+
+ind <- c(g_b40  = "SI.SPR.PC40.ZG",   # growth, bottom 40%
+         g_all  = "SI.SPR.PCAP.ZG",   # growth, total population
+         gdp_pc = "NY.GDP.PCAP.CD")   # GDP per capita (current US$)
+
+raw <- WDI(country = "all", indicator = ind,
+           start = 2000, end = 2024, extra = TRUE) %>%
+  filter(region != "Aggregates")      # drop regional/income aggregates
+
+# Bottom-40% income was downloaded separately because the combined
+# request timed out, then joined by country code and year.
+b40_df <- WDI(country = "all", indicator = c(b40 = "SI.SPR.PC40"),
+              start = 2000, end = 2024)
+
+raw <- raw %>%
+  left_join(b40_df %>% select(iso3c, year, b40), by = c("iso3c", "year"))
+
+dir.create("data", showWarnings = FALSE)
+saveRDS(raw, "data/wdi_section2.rds")
+
+```
+
+
 
 ### Section 3
 
