@@ -6,6 +6,9 @@ output:
   html_document:
     theme: flatly
     toc: false
+bibliography: references.bib
+csl: apa.csl
+
 ---
 ## Introduction
 
