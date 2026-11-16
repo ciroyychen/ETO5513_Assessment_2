@@ -37,7 +37,22 @@ This section is about Inequality and and explores the following questions:
 - Is higher inequality associated with higher poverty?
 - How does the income share of the richest 10% compare with the poorest 20% across regions?
 
-Datasets (SI.POV.GINI, SI.DST.FRST.20, SI.DST.05TH.20, SI.DST.10TH.10)
+Indicators used
+SI.POV.GINI (Gini index), 
+SI.DST.FRST.20 (Income share held by the lowest 20%)
+SI.DST.05TH.20 (Income share held by the highest 20%), 
+SI.DST.10TH.10 (Income share held by the highest 10%)
+
+The Gini index is...
+
+```{r read_data}
+
+Section3_data<-read.csv("Data/Section3_data.csv")|>
+  filter(!is.na(Gini_index))|>
+  filter(year==2024)
+view(Section3_data)
+
+```
 
 
 ### Section 4
