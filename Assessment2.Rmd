@@ -32,9 +32,13 @@ summary(cars)
 
 ### Section 3
 
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
+This section is about Inequality and and explores the following questions:
+
+- Is higher inequality associated with higher poverty?
+- How does the income share of the richest 10% compare with the poorest 20% across regions?
+
+Datasets (SI.POV.GINI, SI.DST.FRST.20, SI.DST.05TH.20, SI.DST.10TH.10)
+
 
 ### Section 4
 
