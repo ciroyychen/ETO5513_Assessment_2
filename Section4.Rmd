@@ -1,0 +1,54 @@
+---
+title: "Section 4"
+author: "Yuyao Chen"
+date: "2026-11-14"
+output: 
+  html_document:
+    theme: flatly
+    toc: false
+bibliography: references.bib
+csl: apa.csl
+
+---
+
+## Introduction
+
+
+
+## Analysis sections
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE,fig.align = "center")
+
+# Loading libraries
+pacman::p_load(readr,dplyr,ggplot2,tidyverse,knitr,kableExtra,scales,WDI)
+```
+
+### Section 1
+
+
+
+
+### Section 2
+
+
+```{r cars}
+summary(cars)
+```
+
+### Section 3
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+### Section 4
+
+
+
+
+## Conclusion
+
+## Reference {-}
+
