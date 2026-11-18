@@ -13,9 +13,7 @@ csl: apa.csl
 ## Introduction
 
 
-
 ## Analysis sections
-
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE,fig.align = "center")
@@ -24,8 +22,8 @@ knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE,fig.align =
 pacman::p_load(readr,dplyr,ggplot2,tidyverse,knitr,kableExtra,scales,WDI)
 ```
 
-### Section 1
 
+### Section 1
 
 
 
@@ -49,5 +47,5 @@ plot(pressure)
 
 ## Conclusion
 
-## Reference
+## Reference {-}
 
