@@ -43,14 +43,31 @@ SI.DST.FRST.20 (Income share held by the lowest 20%)
 SI.DST.05TH.20 (Income share held by the highest 20%), 
 SI.DST.10TH.10 (Income share held by the highest 10%)
 
-The Gini index is...
+The Gini index is a measure of wealth or income inequality. A Gini index of 1 represents the maximum amount of inequality, while an index of 0 represents perfect equality amongst a population. [@owid-what-is-the-gini-coefficient] One research question which will be explored in this section is "Is higher inequality associated with higher poverty?". We may expect that a country with high income inequality may have more extreme levels of wealth, both high and low. Therefore, we would expect that higher inequality would be associated with higher poverty, but this needs to be explored with actual data.
+
+The chart below charts the Gini index (income inequality) against the proportion of the population who live below the extreme poverty line (less than $3 per day). It shows a slight correlation: higher inequality is associated with higher poverty, on average, however, the effect is not strong.
 
 ```{r read_data}
 
 Section3_data<-read.csv("Data/Section3_data.csv")|>
-  filter(!is.na(Gini_index))|>
-  filter(year==2024)
-view(Section3_data)
+  filter(year >= 2015 & year <= 2024)|>
+  group_by(country)|>
+  summarise(
+    average_gini = mean(Gini_index,na.rm = TRUE),
+    average_poverty = mean(Percent_pop_3,na.rm = TRUE)
+    )|>
+  filter(average_gini!="NaN")
+  
+  ggplot(Section3_data,
+    aes(
+      x = average_poverty,
+      y = average_gini
+    ) 
+  )+
+  geom_point()
+
+
+
 
 ```
 
