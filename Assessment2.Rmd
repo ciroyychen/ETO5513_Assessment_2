@@ -45,31 +45,102 @@ SI.DST.10TH.10 (Income share held by the highest 10%)
 
 The Gini index is a measure of wealth or income inequality. A Gini index of 1 represents the maximum amount of inequality, while an index of 0 represents perfect equality amongst a population. [@owid-what-is-the-gini-coefficient] One research question which will be explored in this section is "Is higher inequality associated with higher poverty?". We may expect that a country with high income inequality may have more extreme levels of wealth, both high and low. Therefore, we would expect that higher inequality would be associated with higher poverty, but this needs to be explored with actual data.
 
-The chart below charts the Gini index (income inequality) against the proportion of the population who live below the extreme poverty line (less than $3 per day). It shows a slight correlation: higher inequality is associated with higher poverty, on average, however, the effect is not strong.
+The chart below charts the Gini index (income inequality) against the proportion of the population who live in poverty line (less than $4.20 per day). It shows a slight correlation: higher inequality is associated with higher poverty, on average, however, the effect is not strong. This is in line with previous research (INSERT REFERENCE).
 
-```{r read_data}
+```{r Relationship between inequality and poverty}
 
-Section3_data<-read.csv("Data/Section3_data.csv")|>
+Section3_data<-read.csv("Data/Section3_data.csv")
+view(Section3_data)
+
+Poverty_inequality <- Section3_data |>
   filter(year >= 2015 & year <= 2024)|>
   group_by(country)|>
   summarise(
     average_gini = mean(Gini_index,na.rm = TRUE),
-    average_poverty = mean(Percent_pop_3,na.rm = TRUE)
+    average_poverty = mean(Percent_pop_4.2,na.rm = TRUE)
     )|>
   filter(average_gini!="NaN")
   
-  ggplot(Section3_data,
+view(Poverty_inequality)
+
+
+  ggplot(Poverty_inequality,
     aes(
       x = average_poverty,
       y = average_gini
     ) 
   )+
-  geom_point()
-
-
+  geom_point()+
+  geom_smooth(method = "lm")
 
 
 ```
+
+Further insights can be attainted by looking at the counbtries with the lowest Gini index, as table X shows.
+
+In line with the previous finding that lower inequality is accosiated with lower poverty, we see that for most of these countries, the proportion of the population living below $4.20 is very low. However there are three outliers: India, Kiribati, and Syrian Arab Republic.
+
+Most countries are from Central and Eastern Europe.
+
+India having the lowest Gini index is also surprising, given the anecdotal evidence of large disparities in wealth amongst the population. The technical notes for the data <insert REFERENCE> sighlight that for india, the Gini Index is based on comsumption, rather than income. As a result, it has an abnormally low Gini index.
+
+United Arab Emirates has a low Gini indiex, and a poverty score of 0%; however, there are concerns this masks the tough living conditions for many migrant workers <insert reference>. 
+
+This table highlights the importance of considering supplementary information, and data limitations, when analyzing the economy of a particular nation; the broad indicators may not provide a complete picture, as can be seen with India and United Arab Emirates.
+
+```{r Countries with the lowest GINI index}
+
+Poverty_inequality_sort <- Poverty_inequality |>
+  arrange(average_gini)
+
+knitr::kable(
+head(Poverty_inequality_sort,10),
+caption = "Table 3: Countries with the lowest Gini Index",
+digits=2
+)
+
+
+```
+
+The chart below shows the income distribution for Australia and ten other selected countries.
+
+```{r Income distribution (Australia compared to Selected countries)}
+
+Income_dist <- Section3_data |>
+  filter(year >= 2015 & year <= 2024,
+         country %in% c("Australia","Japan","China","Indonesia","United States","India","South Africa","New Zealand","Phillipines","United Kingdom","Namibia"))|>
+  group_by(country)|>
+  summarise(
+    Ave_income_share_lowest_20 = mean(Income_share_lowest_20,na.rm = TRUE),
+    Ave_income_share_highest_10 = mean(Income_share_highest_10,na.rm = TRUE)
+    )|>
+  filter(Ave_income_share_lowest_20!="NaN")|>
+  mutate(Ave_income_share_20to90 = 100-Ave_income_share_lowest_20-Ave_income_share_highest_10)|>
+  select(country,Ave_income_share_lowest_20,Ave_income_share_20to90,Ave_income_share_highest_10)
+  
+
+Income_dist2 <-Income_dist |>
+  pivot_longer(cols = c(Ave_income_share_lowest_20,Ave_income_share_20to90,Ave_income_share_highest_10),
+               names_to = "Income_share_bracket",
+               values_to = "Share_of_income") |>
+  mutate(
+    Income_share_bracket=recode(
+      Income_share_bracket,
+      Ave_income_share_lowest_20 = "Bottom 20%",
+      Ave_income_share_20to90 = "Middle 70%", 
+      Ave_income_share_highest_10 = "Top 10%")
+    ) |>
+  mutate(Income_share_bracket = factor(
+    Income_share_bracket, 
+    levels=c("Top 10%", "Middle 70%", "Bottom 20%")
+    ))
+
+
+ggplot(Income_dist2, aes(x = country, y = Share_of_income, fill = Income_share_bracket)) +
+  geom_bar(stat = "identity", position = "stack")
+
+```
+
 
 
 ### Section 4
