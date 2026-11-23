@@ -30,20 +30,146 @@ pacman::p_load(readr,dplyr,ggplot2,tidyverse,knitr,kableExtra,scales,WDI)
 ### Section 2
 
 
-```{r cars}
-summary(cars)
-```
+
+
 
 ### Section 3
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+
+
+
+
+
+### Section 4: Poverty and wellbeing - by Yuyao Chen
+
+This section examines the relationship between poverty, life expectancy and GDP per capita across countries by using World Bank data from 2015 to 2023.
+
+#### 4.1 Research question
+
+- 1. Do countries with higher extreme poverty rates have lower life expectancy?
+- 2. Does the relationship between poverty and life expectancy remain after accounting for GDP per capita?
+
+```{r data-preparation}
+
+# Set up the data set, end with 2023 as only 26 countries data in 2024 and too many missing values in 2025
+sec4_data <- WDI(country = "all",indicator = c(poverty = "SI.POV.DDAY",life_expectancy = "SP.DYN.LE00.IN",gdp_per_capita = "NY.GDP.PCAP.CD"),
+  start = 2015,end = 2023,extra = TRUE)
+
+# Remove regional aggregates and NA values
+sec4_use <- sec4_data|>
+  filter(!is.na(region),region != "Aggregates",!is.na(poverty),
+    !is.na(life_expectancy),!is.na(gdp_per_capita),gdp_per_capita > 0)|>
+  mutate(gdp_group = case_when(gdp_per_capita < 5000 ~ "Low GDP",gdp_per_capita < 20000 ~ "Middle GDP",TRUE ~ "High GDP"),
+         log_gdp = log(gdp_per_capita),
+         gdp_group = factor(gdp_group,levels = c("Low GDP", "Middle GDP", "High GDP")))
+
+sec4_n <- nrow(sec4_use)
+sec4_countries <- n_distinct(sec4_use$iso3c)
+
+stopifnot(sec4_n > 0)
+
+# checking the correlation between poverty and life expectancy
+sec4_correlation <- round(cor(sec4_use$poverty,sec4_use$life_expectancy),3)
+
+# prepare the model1 and model2 for regression
+sec4_model1 <- lm(life_expectancy ~ poverty + factor(year),data = sec4_use)
+sec4_model2 <- lm(life_expectancy ~ poverty + log_gdp + factor(year),data = sec4_use)
+
 ```
 
-### Section 4
+#### 4.2 Data description
 
+The analysis includes `r sec4_n` country-year observations from `r sec4_countries` countries with complete data. GDP per capita is categorised into three groups: low (below US$5,000), middle (US$5,000–19,999) and high (US$20,000 or above).
 
+```{r Table-description}
 
+sec4_summary <- sec4_use|>
+  summarise(across(c(poverty, life_expectancy, gdp_per_capita),
+                   list(Observations = ~n(),Mean = mean,Median = median,`Standard deviation`= sd,Min = min,Max = max),.names = "{.col}_{.fn}"))|>
+  pivot_longer(everything(),names_to = c("Variable", ".value"),
+               names_pattern = "^(poverty|life_expectancy|gdp_per_capita)_(.*)$")|>
+  mutate(Variable = recode(Variable,poverty = "Poverty rate(%)",life_expectancy = "Life expectancy (years)",
+                           gdp_per_capita = "GDP per capita (US$)"))
+
+knitr::kable(sec4_summary,digits = 2,escape = FALSE,format = "html",
+  caption = "<span style='color:black;font-size:14px;'>Table 1. Descriptive statistics of poverty and wellbeing</span>",
+  align = c("l","r","r","r","r","r","r"))|>
+  kableExtra::kable_styling(full_width = TRUE,font_size = 12,bootstrap_options = c("bordered","condensed"))
+
+```
+
+The above Table 1 provides descriptive statistics for 702 observations, showing substantial economic disparities across countries.The mean poverty rate (`r round(sec4_summary$Mean[1], 2)`%) is considerably higher than the median (`r round(sec4_summary$Median[1], 2)`%), indicating a right-skewed distribution where a few countries experience exceptionally high poverty. GDP per capita exhibits considerable variation (SD = US$24,606), highlighting significant differences in economic development.
+
+#### 4.3 Data visualisation and analysis
+
+Figure 1 illustrates a negative relationship between extreme poverty and life expectancy. Countries with higher poverty rates generally exhibit shorter life expectancy, although considerable variation exists. High GDP countries are concentrated at low poverty rates and typically have longer life expectancy, while low GDP countries tend to experience poorer health outcomes.However, variation within GDP groups suggests that other factors may also influence life expectancy.
+
+**Figure 1. Relationship between poverty and life expectancy by GDP group**
+```{r Fig1-scatterplot,fig.width=12, fig.height=8}
+
+ggplot(sec4_use,aes(x = poverty, y = life_expectancy, color = gdp_group))+
+  geom_point(alpha = 0.65,size = 2.5) +
+  geom_smooth(method = "lm",se = TRUE,color = "navy")+
+  labs(title = NULL,x = "Poverty rate (%)",y = "Life expectancy (years)",color = "GDP group")+
+  theme_minimal(base_size = 12)|>
+  theme(plot.background = element_rect(fill = "white", colour = NA),panel.background = element_rect(fill = "white", colour = NA),# White background
+        axis.text.y = element_text(size = 11, colour = "black"),axis.text.x = element_text(size = 11, colour = "black"),
+        axis.title.y = element_text(size = 11), axis.title.x = element_text(size = 11),
+        legend.text = element_text(size = 12), legend.position = "bottom",legend.background = element_rect(fill = "white", colour = NA),
+        panel.grid.major = element_line(colour = "grey90"),panel.grid.minor = element_blank())
+
+```
+
+Figure 2 compares the distribution of life expectancy across GDP groups. Median life expectancy increases from approximately 70 years in the low-GDP group to over 80 years in the high-GDP group. The low-GDP group also shows substantially greater variation, suggesting that countries with lower GDP per capita experience more diverse health outcomes.
+
+**Figure 2. Distribution of life expectancy across GDP groups**
+```{r Fig2-boxplot,fig.width=12, fig.height=8}
+
+ggplot(sec4_use, aes(x = gdp_group, y = life_expectancy, fill = gdp_group))+
+  geom_boxplot(width = 0.5,alpha = 0.7,outlier.shape = NA)+
+  geom_jitter(width = 0.12,size = 1.5,alpha = 0.4,color = "grey30")+
+  scale_fill_manual(values = c("Low GDP" = "lightpink","Middle GDP" = "lightgreen","High GDP" = "lightblue"))+
+  labs(title = NULL, x = NULL, y = "Life expectancy (years)")+
+  theme_minimal(base_size = 12)+
+  theme(legend.position = "none",
+    plot.title = element_text(hjust = 0),
+    axis.text.y = element_text(size = 11, colour = "black"),axis.text.x = element_text(size = 11, colour = "black"),
+    axis.title.y = element_text(size = 11), axis.title.x = element_text(size = 11),
+    panel.grid.major.x = element_blank())
+
+```
+
+Table 2 compares two regression models. Model 1 identifies a relationship between poverty and life expectancy, while Model 2 added log GDP per capita variable. 
+
+```{r Table2-regression}
+
+# Table 2 for regression comparison
+sec4_regression <- data.frame(Variable = c("Poverty coefficient","Poverty p-value","GDP coefficient","GDP p-value","Adjusted R²"),
+  `Model 1: Poverty only` = c(coef(sec4_model1)["poverty"],coef(summary(sec4_model1))["poverty", "Pr(>|t|)"],
+    NA,NA,summary(sec4_model1)$adj.r.squared),
+  `Model 2: Poverty + GDP` = c( coef(sec4_model2)["poverty"],coef(summary(sec4_model2))["poverty", "Pr(>|t|)"],
+    coef(sec4_model2)["log_gdp"],coef(summary(sec4_model2))["log_gdp", "Pr(>|t|)"],summary(sec4_model2)$adj.r.squared),
+  check.names = FALSE,row.names = NULL)
+
+# Format numbers and p values
+sec4_regression[,2:3] <- lapply(
+  sec4_regression[,2:3],function(x) ifelse(is.na(x),"NA",sprintf("%.3f", x)))
+
+# Display very small p-values as <0.001
+p_rows <- sec4_regression$Variable %in% c("Poverty p-value", "GDP p-value")
+
+sec4_regression[p_rows, 2:3] <- lapply(
+  sec4_regression[p_rows, 2:3],function(x) {ifelse(x == "0.000","<0.001",x)})
+
+kable(sec4_regression,row.names = FALSE,align = c("l", "r", "r"),format = "html",escape = FALSE,
+      caption = "<span style='color:black;font-size:14px;'>Table 2. Comparison of regression models</span>")|>
+  kableExtra::kable_styling(full_width = TRUE,font_size = 12,bootstrap_options = c("bordered","condensed"))
+
+```
+
+In Model 1, poverty is significantly negatively associated with life expectancy (β = −0.336, p < 0.001). After controlling for log GDP per capita in Model 2, the poverty coefficient decreases in magnitude to −0.131 but remains statistically significant (p < 0.001). Meanwhile, log GDP per capita shows a significant positive association with life expectancy (β = 3.402, p < 0.001). The increase in adjusted R² from 0.520 to 0.784 indicates that Model 2 fits the data better and explains more variation in life expectancy.
+
+Overall, the findings suggest that higher extreme poverty is associated with lower life expectancy, even after accounting for GDP per capita. However, the weaker poverty coefficient in Model 2 suggests that economic development explains part of the observed relationship. The research by @yu2026 also highlights the complex relationship between poverty, economic development and population health. However, these findings only represent statistical associations and do no necessarily imply causation.
 
 ## Conclusion
 
