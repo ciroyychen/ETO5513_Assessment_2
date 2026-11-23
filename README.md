@@ -15,7 +15,7 @@ Data is obtained from the World Bank and the Poverty and Inequality Platform(htt
 1. Clone this GitHub repository.
 2. Open the project in RStudio.
 3. Install the required R packages.
-4. Run the main R Markdown file to reproduce the report.
+4. Knit the Assessment1.Rmd Markdown file to reproduce the HTML file, print the HTML to PDF.
 
 ### Collaboration
 Each team member works on an individual Git branch, completed sections are merged into the master branch
