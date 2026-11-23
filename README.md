@@ -22,3 +22,19 @@ Each team member works on an individual Git branch, completed sections are merge
 
 ### License
 Original project code is released under the MIT License. World bank data is subject to its original licensing terms.
+
+### Section 2 details: Growth and the Poor
+**Data.** World Bank World Development Indicators, downloaded with the `WDI` package on 15 November 2026. Indicators used:
+
+| Variable | Indicator | Code |
+|---|---|---|
+| `g_b40` | Annualised growth in survey mean consumption or income, bottom 40% (%) | `SI.SPR.PC40.ZG` |
+| `g_all` | Annualised growth in survey mean consumption or income, total population (%) | `SI.SPR.PCAP.ZG` |
+| `b40` | Survey mean consumption or income per capita, bottom 40% (2021 PPP $ per day) | `SI.SPR.PC40` |
+| `gdp_pc` | GDP per capita (current US$) | `NY.GDP.PCAP.CD` |
+
+The cleaned data are saved in `data/wdi_section2.rds` and committed to the repository, so the report knits without an internet connection. The code that created the file is in the `s2_data_source` chunk (`eval = FALSE`) at the end of Section 2 in `Assessment2.Rmd`. If you rebuild it, retry if the World Bank API times out.
+
+**Packages.** The setup chunk uses `pacman`, so install it first with `install.packages("pacman")`. `pacman::p_load()` then installs and loads the rest. Knitting to PDF also needs LaTeX, for example `install.packages("tinytex")` then `tinytex::install_tinytex()`.
+
+**Notes.** For each country the analysis uses the most recent survey year with data, so years differ between countries.
