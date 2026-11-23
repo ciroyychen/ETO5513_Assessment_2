@@ -12,15 +12,11 @@ csl: apa.csl
 ---
 ## Introduction
 
-<<<<<<< HEAD
-=======
 Reducing poverty is a central goal of international development, yet progress is uneven across countries and across groups within them. Average incomes can rise while the poorest households gain little, and countries with similar average incomes can have very different poverty outcomes. This report uses World Bank poverty and inequality indicators [@worldbank2026], accessed through the WDI package [@arelbundock2026], to ask what is associated with poverty reduction across countries and who is still being left behind.
 
 The theme builds on a long-standing question in development economics: whether economic growth benefits the poor, and whether it does so proportionately [@dollar2002]. The report compares countries using their most recent available household survey, because most countries conduct surveys only every few years, and it checks indicator coverage before each analysis.
 
 The report has four analysis sections. The first describes levels and trends in extreme poverty and compares international and national poverty lines. The second asks whether income growth for the bottom 40% keeps pace with growth for the whole population, and whether higher-income countries have higher bottom-40% incomes. The third examines inequality and its relationship with poverty and the income distribution. The fourth links poverty to wellbeing through life expectancy and GDP per capita. The conclusion draws the findings together and discusses limitations, including the patchiness of survey data.
-
->>>>>>> origin/master
 
 ## Analysis sections
 
