@@ -107,19 +107,22 @@ The chart below shows the income distribution for Australia and ten other select
 ```{r Income distribution (Australia compared to Selected countries)}
 
 Income_dist <- Section3_data |>
-  filter(year >= 2015 & year <= 2024,
-         country %in% c("Australia","Japan","China","Indonesia","United States","India","South Africa","New Zealand","Phillipines","United Kingdom","Namibia"))|>
+  filter(year >= 2015 & year <= 2024)|>
   group_by(country)|>
   summarise(
     Ave_income_share_lowest_20 = mean(Income_share_lowest_20,na.rm = TRUE),
-    Ave_income_share_highest_10 = mean(Income_share_highest_10,na.rm = TRUE)
+    Ave_income_share_highest_10 = mean(Income_share_highest_10,na.rm = TRUE),
+    average_gini = mean(Gini_index,na.rm = TRUE),
+    average_poverty = mean(Percent_pop_4.2,na.rm = TRUE)
     )|>
   filter(Ave_income_share_lowest_20!="NaN")|>
-  mutate(Ave_income_share_20to90 = 100-Ave_income_share_lowest_20-Ave_income_share_highest_10)|>
-  select(country,Ave_income_share_lowest_20,Ave_income_share_20to90,Ave_income_share_highest_10)
+  mutate(Ave_income_share_20to90 = 100-Ave_income_share_lowest_20-Ave_income_share_highest_10)
+  
   
 
 Income_dist2 <-Income_dist |>
+  select(country,Ave_income_share_lowest_20,Ave_income_share_20to90,Ave_income_share_highest_10)|>
+  filter(country %in% c("Australia","Japan","China","Indonesia","United States","India","South Africa","New Zealand","Phillipines","United Kingdom","Namibia"))|>
   pivot_longer(cols = c(Ave_income_share_lowest_20,Ave_income_share_20to90,Ave_income_share_highest_10),
                names_to = "Income_share_bracket",
                values_to = "Share_of_income") |>
@@ -141,7 +144,22 @@ ggplot(Income_dist2, aes(x = country, y = Share_of_income, fill = Income_share_b
 
 ```
 
+The table below shows the Top 10 countries with the highest share of income concentrated in the top 10% of earners.
 
+```{r Countries with the lowest GINI index}
+
+Income_dist_sort <- Income_dist |>
+  arrange(desc(Ave_income_share_highest_10))|>
+  select(country,Ave_income_share_highest_10,average_gini,average_poverty)
+
+knitr::kable(
+head(Income_dist_sort,10),
+caption = "Table 3: Countries with the highest concentration of income in the top 10% of earners",
+digits=2
+)
+
+
+```
 
 ### Section 4
 
