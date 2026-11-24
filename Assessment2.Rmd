@@ -158,16 +158,16 @@ saveRDS(raw, "data/wdi_section2.rds")
 
 This section is about inequality and and explores the following questions:
 
-- 1. Is higher inequality associated with higher poverty?
-- 2. How does the income share of the richest 10% compare with the poorest 20% across regions?
+1. Is higher inequality associated with higher poverty?
+2. How does the income share of the richest 10% compare with the poorest 20% across regions?
 
 #### 3.2 Relationship between inequality and poverty
 
-A common measure of wealth or income inequality is the the Gini index. A Gini index of 1 represents maximum inequality, while an index of 0 represents perfect equality across a population. [@owid-what-is-the-gini-coefficient] 
+A common measure of income inequality is the Gini index. A Gini index of 1 represents maximum inequality, while an index of 0 represents perfect equality across a population. [@owid-what-is-the-gini-coefficient] 
 
-Figure 1 charts the Gini index (wealth inequality) against the proportion of the population who live in poverty (in this case, poverty is defined as those living on less than $4.20 per day). 
+Figure 1 charts the Gini index (income inequality) against the proportion of the population who live in poverty (defined here as living on less than $4.20 per day). 
 
-The scatterplot reveals a strong positive correlation: on average, higher inequality is associated with higher poverty. This finding is in line with previous research (@Karagiannaki2017, p46).
+The scatterplot reveals a strong positive correlation: on average, higher inequality is associated with higher poverty. This finding is in line with previous research [@Karagiannaki2017].
 
 ```{r s3_fig1 Relationship between inequality and poverty}
 
@@ -204,13 +204,13 @@ view(Poverty_inequality)
 
 Table 1 highlights the top ten countries with the lowest Gini index, and their corresponding poverty rates.
 
-In line with the relationship highlighted in the preceding chart, we see that for most of these countries the poverty rate is very low. There are, however, three outliers: India, Kiribati, and Syrian Arab Republic.
+In line with the relationship highlighted in the preceding chart, for most of these countries the poverty rate is very low. There are, however, three outliers: India, Kiribati, and Syrian Arab Republic.
 
 India having the lowest Gini index is surprising, given that research has shown a high concentration of wealth in India's top 1% (@10.1093/wber/lhag013). A technical note published by the World Bank (@WorldBank2025) highlights that for India, the Gini Index is based on consumption, rather than income, which results in a lower Gini index.
 
-United Arab Emirates has a low Gini index, and a poverty rate of 0%. While this may, on the surface, indicate low poverty and inequality, the financial exploitation and tough living conditions for migrant workers in this country has been widely written about (@Garret2023). 
+United Arab Emirates has a low Gini index, and a poverty rate of 0%. While this may, on the surface, indicate low poverty and inequality, the financial exploitation and tough living conditions for migrant workers in this country has been widely reported (@Garret2023). 
 
-Table 1 therefore highlights the importance of considering supplementary information and data limitations when analyzing the economy of a particular nation; broad indicators alone may not provide a complete picture.
+Table 1 therefore highlights the importance of considering supplementary information and data limitations when analyzing particular nations; broad indicators alone may not provide a complete picture.
 
 ```{r s3_tab1 Countries with the lowest Gini index}
 
@@ -224,7 +224,7 @@ col.names = c(
     "Average Gini coefficient",
     "Average poverty rate (%)"
   ),
-caption = "S3-Table 1: Countries with the lowest Gini Index",
+caption = "Table 1: Countries with the lowest Gini Index",
 digits=2
 )
 
@@ -232,11 +232,11 @@ digits=2
 
 #### 3.2 Income distribution across regions
 
-Figure 3.2 below shows the income distribution for Australia and ten other countries. In Australia, the top 10% of the population have 26% of the income. This is slightly below the median of 27.34% (based on the 151 countries with available data). The bottom 20% of the population only have 7.3% of the income.
+Figure 3.2 shows the income distribution for Australia against selected countries. In Australia, the top 10% of the population have 26% of the income. This is slightly below the median of 27.34%. The bottom 20% of the population only have 7.3% of the income.
 
-Australia's distribution is broadly similar to other developed economies (United States, United Kingdom) and also developing Asian countries (Chine, Indonesia).
+Australia's distribution is broadly similar to other developed countries (United States, United Kingdom) and developing Asian countries (Chine, Indonesia).
 
-The two outliers in this data are the two African countries (South Africa and Namibia), which have much higher rates.
+The two outliers are the African countries (South Africa and Namibia), which have much higher rates.
 
 ```{r s3_fig2 Income distribution of selected countries, fig.width=10, fig.height=6, out.width="100%"}
 
@@ -286,7 +286,7 @@ ggplot(Income_dist2, aes(x = country, y = Share_of_income, fill = Income_share_b
 
 ```
 
-The tables below show the top 10 countries with the highest and lowest shares of income for the top 10% of the population.
+Table 2 shows the top 10 countries with the highest and lowest shares of income for the top 10% of the population.
 
 The countries with highest share all have a high Gini index (far higher than the median of 35.42), and most have extremely high rates of poverty.
 
@@ -321,7 +321,7 @@ knitr::kable(
     "Average Gini coefficient",
     "Average poverty rate (%)"
   ),
-  caption = "Table 3.2-A: Countries with the highest concentration of income in the top 10% of earners",
+  caption = "Table 2: Countries with the highest share of income in the top 10% of the population",
   digits = 2
 ) |>
   kableExtra::row_spec(11, bold = TRUE, italic = TRUE)
