@@ -315,16 +315,20 @@ Income_dist_lowest_share <- Income_dist |>
 
 knitr::kable(
   bind_rows(Income_dist_highest_share, Income_dist_median, Income_dist_lowest_share),
+  format = "html",
   col.names = c(
     "Country",
-    "Top 10% income share (%)",
-    "Average Gini coefficient",
-    "Average poverty rate (%)"
+    "Top 10% income<br>share (%)",
+    "Average Gini<br>coefficient",
+    "Average poverty<br>rate (%)"
   ),
   caption = "Table 2: Countries with the highest share of income in the top 10% of the population",
+  escape = FALSE,
   digits = 2
+  
 ) |>
-  kableExtra::row_spec(11, bold = TRUE, italic = TRUE)
+  kableExtra::row_spec(11, bold = TRUE, italic = TRUE)|>
+  kable_styling(full_width = TRUE)
 
 ```
 
@@ -342,7 +346,7 @@ This section examines the relationship between poverty, life expectancy and GDP 
 #### 4.1 Research question
 
 - 1. Do countries with higher extreme poverty rates have lower life expectancy?
-- 2. Does the relationship between poverty and life expectancy remain after accounting for GDP per capital?
+- 2. Does the relationship between poverty and life expectancy remain after accounting for GDP per capita?
 
 ```{r data-preparation}
 
