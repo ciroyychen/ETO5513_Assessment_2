@@ -384,7 +384,187 @@ saveRDS(raw, "data/wdi_section2.rds")
 
 
 
-### Section 3
+### Section 3: Inequality - by James Costabile
+
+#### 3.1 Research questions
+
+This section is about inequality and and explores the following questions:
+
+1. Is higher inequality associated with higher poverty?
+2. How does the income share of the richest 10% compare with the poorest 20% across regions?
+
+#### 3.2 Relationship between inequality and poverty
+
+A common measure of income inequality is the Gini index. A Gini index of 1 represents maximum inequality, while an index of 0 represents perfect equality across a population. [@owid-what-is-the-gini-coefficient] 
+
+Figure 1 charts the Gini index (income inequality) against the proportion of the population who live in poverty (defined here as living on less than $4.20 per day). 
+
+The scatterplot reveals a strong positive correlation: on average, higher inequality is associated with higher poverty. This finding is in line with previous research [@Karagiannaki2017].
+
+```{r s3_fig1 Relationship between inequality and poverty}
+
+Section3_data<-read.csv("Data/Section3_data.csv")
+view(Section3_data)
+
+
+Poverty_inequality <- Section3_data |>
+  filter(year >= 2015 & year <= 2024)|>
+  group_by(country)|>
+  summarise(
+    average_gini = mean(Gini_index,na.rm = TRUE),
+    average_poverty = mean(Percent_pop_4.2,na.rm = TRUE)
+    )|>
+  filter(average_gini!="NaN")
+  
+view(Poverty_inequality)
+
+
+  ggplot(Poverty_inequality,
+    aes(
+      x = average_poverty,
+      y = average_gini
+    ) 
+  )+
+  geom_point()+
+  geom_smooth(method = "lm")+
+  labs(title = "S3-Figure 1: Relationship between inequality and poverty",
+       x = "Poverty rate (averaged)",
+       y = "Gini index (averaged)"
+  )
+
+```
+
+Table 1 highlights the top ten countries with the lowest Gini index, and their corresponding poverty rates.
+
+In line with the relationship highlighted in the preceding chart, for most of these countries the poverty rate is very low. There are, however, three outliers: India, Kiribati, and Syrian Arab Republic.
+
+India having the lowest Gini index is surprising, given that research has shown a high concentration of wealth in India's top 1% (@10.1093/wber/lhag013). A technical note published by the World Bank (@WorldBank2025) highlights that for India, the Gini Index is based on consumption, rather than income, which results in a lower Gini index.
+
+United Arab Emirates has a low Gini index, and a poverty rate of 0%. While this may, on the surface, indicate low poverty and inequality, the financial exploitation and tough living conditions for migrant workers in this country has been widely reported (@Garret2023). 
+
+Table 1 therefore highlights the importance of considering supplementary information and data limitations when analyzing particular nations; broad indicators alone may not provide a complete picture.
+
+```{r s3_tab1 Countries with the lowest Gini index}
+
+Poverty_inequality_sort <- Poverty_inequality |>
+  arrange(average_gini)
+
+knitr::kable(
+head(Poverty_inequality_sort,10),
+col.names = c(
+    "Country",
+    "Average Gini coefficient",
+    "Average poverty rate (%)"
+  ),
+caption = "Table 1: Countries with the lowest Gini Index",
+digits=2
+)
+
+```
+
+#### 3.2 Income distribution across regions
+
+Figure 3.2 shows the income distribution for Australia against selected countries. In Australia, the top 10% of the population have 26% of the income. This is slightly below the median of 27.34%. The bottom 20% of the population only have 7.3% of the income.
+
+Australia's distribution is broadly similar to other developed countries (United States, United Kingdom) and developing Asian countries (Chine, Indonesia).
+
+The two outliers are the African countries (South Africa and Namibia), which have much higher rates.
+
+```{r s3_fig2 Income distribution of selected countries, fig.width=10, fig.height=6, out.width="100%"}
+
+Income_dist <- Section3_data |>
+  filter(year >= 2015 & year <= 2024)|>
+  group_by(country)|>
+  summarise(
+    Ave_income_share_lowest_20 = mean(Income_share_lowest_20,na.rm = TRUE),
+    Ave_income_share_highest_10 = mean(Income_share_highest_10,na.rm = TRUE),
+    average_gini = mean(Gini_index,na.rm = TRUE),
+    average_poverty = mean(Percent_pop_4.2,na.rm = TRUE)
+    )|>
+  filter(Ave_income_share_lowest_20!="NaN")|>
+  mutate(Ave_income_share_20to90 = 100-Ave_income_share_lowest_20-Ave_income_share_highest_10)
+  
+  
+
+Income_dist2 <-Income_dist |>
+  select(country,Ave_income_share_lowest_20,Ave_income_share_20to90,Ave_income_share_highest_10)|>
+  filter(country %in% c("Australia","Japan","China","Indonesia","United States","India","South Africa","United Kingdom","Namibia","Italy","Germany"))|>
+  pivot_longer(cols = c(Ave_income_share_lowest_20,Ave_income_share_20to90,Ave_income_share_highest_10),
+               names_to = "Income_share_bracket",
+               values_to = "Share_of_income") |>
+  mutate(
+    Income_share_bracket=recode(
+      Income_share_bracket,
+      Ave_income_share_lowest_20 = "Bottom 20%",
+      Ave_income_share_20to90 = "Middle 70%", 
+      Ave_income_share_highest_10 = "Top 10%")
+    ) |>
+  mutate(Income_share_bracket = factor(
+    Income_share_bracket, 
+    levels=c("Top 10%", "Middle 70%", "Bottom 20%")
+    ))
+view(Income_dist2)
+
+ggplot(Income_dist2, aes(x = country, y = Share_of_income, fill = Income_share_bracket)) +
+  geom_bar(stat = "identity", position = "stack") +
+  labs(title = "Figure 3.2: Income distribution of selected countries",
+        x = "Country",
+        y = "Share of income (%)",
+        fill = "Income group")+
+  geom_text(
+    aes(label = round(Share_of_income,1)),
+    position = position_stack(vjust = 0.5)
+  )
+
+```
+
+Table 2 shows the top 10 countries with the highest and lowest shares of income for the top 10% of the population.
+
+The countries with highest share all have a high Gini index (far higher than the median of 35.42), and most have extremely high rates of poverty.
+
+Conversely, the countries with the lowest share are mostly from Central or Eastern Europe, have low Gini indexes, and low rates of poverty, barring three exceptions.
+
+```{r s3_tab2 Countries with the highest share of income received by the top 10%}
+
+Income_dist_median <-Income_dist |>
+  summarise(Ave_income_share_highest_10 = median(Ave_income_share_highest_10),
+            average_gini = median(average_gini),
+            average_poverty = median(average_poverty)) |>
+  mutate(country = "Median (based on 151 countries)")|>
+  select(country,everything())
+
+
+Income_dist_highest_share <- Income_dist |>
+  arrange(desc(Ave_income_share_highest_10))|>
+  select(country,Ave_income_share_highest_10,average_gini,average_poverty)|>
+  head(10)
+
+Income_dist_lowest_share <- Income_dist |>
+  arrange(Ave_income_share_highest_10)|>
+  select(country,Ave_income_share_highest_10,average_gini,average_poverty)|>
+  head(10)|>
+  arrange(desc(Ave_income_share_highest_10))
+
+knitr::kable(
+  bind_rows(Income_dist_highest_share, Income_dist_median, Income_dist_lowest_share),
+  format = "html",
+  col.names = c(
+    "Country",
+    "Top 10% income<br>share (%)",
+    "Average Gini<br>coefficient",
+    "Average poverty<br>rate (%)"
+  ),
+  caption = "Table 2: Countries with the highest share of income in the top 10% of the population",
+  escape = FALSE,
+  digits = 2
+  
+) |>
+  kableExtra::row_spec(11, bold = TRUE, italic = TRUE)|>
+  kable_styling(full_width = TRUE)
+
+```
+
+
 
 
 
@@ -425,6 +605,7 @@ sec4_correlation <- round(cor(sec4_use$poverty,sec4_use$life_expectancy),3)
 # prepare the model1 and model2 for regression
 sec4_model1 <- lm(life_expectancy ~ poverty + factor(year),data = sec4_use)
 sec4_model2 <- lm(life_expectancy ~ poverty + log_gdp + factor(year),data = sec4_use)
+
 
 ```
 
