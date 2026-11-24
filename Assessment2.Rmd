@@ -709,7 +709,7 @@ This report examined the factors associated with poverty reduction across countr
 
 The analysis of poverty trends revealed substantial global progress between 2002 and 2024, particularly in South Asia and East Asia and Pacific. However, regional improvements remain uneven, while considerable differences between international and national poverty rates highlight the importance of country-specific poverty definitions.
 
-The analysis of income growth indicated that the bottom 40% generally kept pace with overall income growth, although regional disparities persisted. Higher GDP per capita was also strongly associated with higher incomes among the poorest 40%, suggesting that economic development is important but does not guarantee equitable outcomes.
+The analysis of income growth indicated that the bottom 40% generally kept pace with, and slightly exceeded, income growth for the whole population: the poorest grew faster in 64% of countries, with a median gap of 0.5 percentage points. Progress was uneven, however, and the bottom 40% fell behind in the Middle East, North Africa, Afghanistan and Pakistan, where only 22% of countries saw faster growth for the poorest. Bottom-40% incomes were also strongly associated with GDP per capita (correlation 0.94 on logged values), suggesting that economic development is important but does not guarantee equitable outcomes.
 
 The wellbeing analysis demonstrated a significant negative association between extreme poverty and life expectancy. This relationship remained statistically significant after accounting for GDP per capita, indicating that poverty is associated with poorer health outcomes beyond differences in national income.
 
