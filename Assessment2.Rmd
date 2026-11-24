@@ -12,11 +12,13 @@ csl: apa.csl
 ---
 ## Introduction
 
-Reducing poverty is a central goal of international development, yet progress is uneven across countries and across groups within them. Average incomes can rise while the poorest households gain little, and countries with similar average incomes can have very different poverty outcomes. This report uses World Bank poverty and inequality indicators [@worldbank2026], accessed through the WDI package [@arelbundock2026], to ask what is associated with poverty reduction across countries and who is still being left behind.
+Reducing poverty is a central goal of international development, yet progress remains uneven across countries and population groups. Average incomes can rise while the poorest households gain little, and countries with similar average incomes can experience very different poverty outcomes. This report uses World Bank poverty and inequality indicators [@worldbank2026], accessed through the WDI package [@arelbundock2026], to investigate what is associated with poverty reduction across countries and who is still being left behind.
 
-The theme builds on a long-standing question in development economics: whether economic growth benefits the poor, and whether it does so proportionately [@dollar2002]. The report compares countries using their most recent available household survey, because most countries conduct surveys only every few years, and it checks indicator coverage before each analysis.
+The theme builds on a long-standing question in development economics: whether economic growth benefits the poor and whether it does so proportionately [@dollar2002]. Extreme poverty is examined using the international threshold of $3.00 per day, expressed in 2021 purchasing power parity. The report examines historical trends and uses the most recent available survey observations for relevant country-level comparisons, while considering differences in indicator coverage and data availability.
 
-The report has four analysis sections. The first describes levels and trends in extreme poverty and compares international and national poverty lines. The second asks whether income growth for the bottom 40% keeps pace with growth for the whole population, and whether higher-income countries have higher bottom-40% incomes. The third examines inequality and its relationship with poverty and the income distribution. The fourth links poverty to wellbeing through life expectancy and GDP per capita. The conclusion draws the findings together and discusses limitations, including the patchiness of survey data.
+The report comprises four analytical sections. The first describes levels and trends in extreme poverty and compares international and national poverty lines. The second examines whether income growth for the bottom 40% keeps pace with overall population growth in income and whether higher-income countries have higher bottom-40% incomes. The third investigates inequality and its relationship with poverty and income distribution. The fourth explores the relationship between poverty and wellbeing through life expectancy and GDP per capita.
+
+Together, these analyses provide a multidimensional perspective on poverty beyond economic growth alone. The conclusion synthesises the findings and discusses methodological limitations, including missing observations, differences in survey years and the comparability of poverty measures across countries.
 
 ## Analysis sections
 
@@ -28,9 +30,229 @@ pacman::p_load(readr,dplyr,ggplot2,tidyverse,knitr,kableExtra,scales,WDI)
 ```
 
 
-### Section 1
+### Section 1: Levels and Trends
 
+#### 1.1 Research Questions
 
+1. How has extreme poverty changed over time, and which regions have progressed fastest?
+
+2. How do the international poverty line of $3.00 per day and national poverty lines differ for the same countries?
+
+#### 1.2 Data Preparation
+
+```{r section1-data-preparation, include=FALSE}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(knitr)
+
+# Load the saved World Bank dataset
+wdi_section1 <- readRDS("data/wdi_section1.rds")
+
+# Prepare country-level data
+section1_clean <- wdi_section1 %>%
+  filter(region != "Aggregates",
+         !is.na(region)) %>%
+  arrange(country, year)
+
+# Prepare regional poverty data
+section1_regional <- wdi_section1 %>%
+  filter(
+    iso3c %in% c("EAS", "ECS", "MEA",
+                 "NAC", "SAS", "WLD"),
+    !is.na(poverty),
+    year >= 2002,
+    year <= 2024
+  ) %>%
+  arrange(country, year)
+
+# Prepare national and international poverty comparison
+section1_comparison <- section1_clean %>%
+  filter(
+    !is.na(poverty),
+    !is.na(national_poverty)
+  ) %>%
+  group_by(country) %>%
+  slice_max(year, n = 1, with_ties = FALSE) %>%
+  ungroup() %>%
+  mutate(
+    difference = national_poverty - poverty,
+    absolute_difference = abs(difference)
+  ) %>%
+  arrange(desc(absolute_difference)) %>%
+  slice_head(n = 10)
+```
+
+#### 1.3 Regional Extreme Poverty Trends
+
+```{r s1-regional-trends, echo=FALSE, warning=FALSE, message=FALSE, fig.width=9, fig.height=6, fig.cap="Figure 1. Extreme poverty trends by region, 2002–2024."}
+
+ggplot(section1_regional,
+       aes(x = year, y = poverty,
+           colour = country)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 1.5) +
+  labs(
+    title = "Extreme poverty trends by region",
+    subtitle = "International poverty line of $3 per day",
+    x = "Year",
+    y = "Poverty headcount ratio (%)",
+    colour = "Region",
+    caption = "Source: World Bank, World Development Indicators"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",
+    legend.text = element_text(size = 8),
+    legend.title = element_blank()
+  ) +
+  guides(colour = guide_legend(ncol = 2))
+
+```
+
+Figure 1 illustrates regional extreme poverty trends between 2002 and 2024, measured using the international poverty threshold of $3.00 per day at 2021 purchasing power parity. Global poverty declined from 33.7% to 10.1%, demonstrating substantial but uneven progress.
+
+```{r s1-regional-table, echo=FALSE, warning=FALSE, message=FALSE}
+
+section1_table1 <- section1_regional %>%
+  filter(year %in% c(2002, 2024)) %>%
+  select(country, year, poverty) %>%
+  pivot_wider(
+    names_from = year,
+    values_from = poverty,
+    names_prefix = "poverty_"
+  ) %>%
+  mutate(
+    reduction = poverty_2002 - poverty_2024,
+    annual_reduction = reduction / 22
+  ) %>%
+  arrange(desc(reduction))
+
+knitr::kable(
+  section1_table1,
+  digits = 2,
+  col.names = c(
+    "Region",
+    "Poverty in 2002 (%)",
+    "Poverty in 2024 (%)",
+    "Reduction (pp)",
+    "Annual reduction (pp)"
+  ),
+  caption = "Table 1. Changes in extreme poverty between 2002 and 2024."
+)
+
+```
+
+Table 1 shows that South Asia achieved the largest reduction among the regions examined, decreasing from 46.0% to 2.6%, followed by East Asia and Pacific, with a reduction of 38 percentage points. The Middle East, North Africa, Afghanistan and Pakistan recorded slower progress, while North America maintained relatively low poverty rates throughout the period.
+
+#### 1.4 International versus National Poverty
+
+```{r s1-poverty-comparison, echo=FALSE, warning=FALSE, message=FALSE, fig.width=9, fig.height=6, fig.cap="Figure 2. Comparison of international and national poverty rates."}
+
+section1_comparison %>%
+  select(country, poverty, national_poverty,
+         absolute_difference) %>%
+  pivot_longer(
+    cols = c(poverty, national_poverty),
+    names_to = "poverty_measure",
+    values_to = "rate"
+  ) %>%
+  mutate(
+    poverty_measure = recode(
+      poverty_measure,
+      poverty = "International ($3/day)",
+      national_poverty = "National poverty line"
+    )
+  ) %>%
+  ggplot(
+    aes(
+      x = reorder(country, absolute_difference),
+      y = rate,
+      fill = poverty_measure
+    )
+  ) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(
+    title = "International versus national poverty rates",
+    subtitle = "Ten countries with the largest absolute differences",
+    x = NULL,
+    y = "Poverty headcount ratio (%)",
+    fill = "Poverty measure",
+    caption = "Source: World Bank, World Development Indicators"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+```
+
+Figure 2 compares international and national poverty rates for the ten countries with the largest absolute differences, using the latest year with both measures available. National poverty rates exceeded international rates in nine selected countries.
+
+```{r s1-comparison-table, echo=FALSE, warning=FALSE, message=FALSE}
+
+section1_table2 <- section1_comparison %>%
+  select(
+    country,
+    year,
+    poverty,
+    national_poverty,
+    difference
+  )
+
+knitr::kable(
+  section1_table2,
+  digits = 2,
+  col.names = c(
+    "Country",
+    "Year",
+    "International poverty (%)",
+    "National poverty (%)",
+    "Difference (pp)"
+  ),
+  caption = "Table 2. Countries with the largest differences between national and international poverty rates."
+)
+
+```
+
+Table 2 identifies Belize as having the largest difference, at 51 percentage points, followed by Honduras and Guatemala. Uganda represents an exception, with international poverty exceeding national poverty by 38.3 percentage points. These discrepancies highlight the importance of poverty definitions and country-specific thresholds.
+
+#### 1.5 Key Findings and Limitations
+
+Declining extreme poverty does not necessarily indicate the elimination of poverty according to national standards. Missing observations, incomplete regional coverage, differing survey years and the selection of countries with the largest discrepancies limit generalisability. Both poverty measures therefore provide complementary perspectives for identifying populations left behind.
+
+Data: World Development Indicators [@worldbank2026], accessed through the WDI package [@arelbundock2026].
+
+```{r s1-data-source, eval=FALSE, echo=FALSE}
+
+# Recreate the Section 1 dataset using World Bank data.
+# The saved RDS file is used when knitting the report.
+
+library(WDI)
+library(dplyr)
+
+options(timeout = 300)
+
+section1_indicators <- c(
+  poverty = "SI.POV.DDAY",
+  national_poverty = "SI.POV.NAHC",
+  poverty_gap = "SI.POV.GAPS",
+  gdp_pc = "NY.GDP.PCAP.CD",
+  population = "SP.POP.TOTL"
+)
+
+wdi_section1 <- WDI(
+  country = "all",
+  indicator = section1_indicators,
+  start = 2000,
+  end = 2025,
+  extra = TRUE
+)
+
+dir.create("data", showWarnings = FALSE)
+
+saveRDS(wdi_section1, "data/wdi_section1.rds")
+
+```
 
 ### Section 2
 
@@ -291,6 +513,18 @@ In Model 1, poverty is significantly negatively associated with life expectancy 
 Overall, the findings suggest that higher extreme poverty is associated with lower life expectancy, even after accounting for GDP per capita. However, the weaker poverty coefficient in Model 2 suggests that economic development explains part of the observed relationship. The research by @yu2026 also highlights the complex relationship between poverty, economic development and population health. However, these findings only represent statistical associations and do no necessarily imply causation.
 
 ## Conclusion
+
+This report examined the factors associated with poverty reduction across countries and identified disparities that persist despite economic development. The findings demonstrate that poverty is a multidimensional issue influenced by economic growth, income distribution and broader wellbeing.
+
+The analysis of poverty trends revealed substantial global progress between 2002 and 2024, particularly in South Asia and East Asia and Pacific. However, regional improvements remain uneven, while considerable differences between international and national poverty rates highlight the importance of country-specific poverty definitions.
+
+The analysis of income growth indicated that the bottom 40% generally kept pace with overall income growth, although regional disparities persisted. Higher GDP per capita was also strongly associated with higher incomes among the poorest 40%, suggesting that economic development is important but does not guarantee equitable outcomes.
+
+The wellbeing analysis demonstrated a significant negative association between extreme poverty and life expectancy. This relationship remained statistically significant after accounting for GDP per capita, indicating that poverty is associated with poorer health outcomes beyond differences in national income.
+
+Several limitations should be acknowledged, including missing observations, inconsistent survey years, differences in national poverty definitions and the inability to establish causal relationships.
+
+Overall, the findings highlight the importance of combining economic growth with inclusive development policies and improved access to essential services. Monitoring multiple poverty and wellbeing indicators is essential for identifying disadvantaged populations and supporting sustainable and equitable poverty reduction.
 
 ## Reference {-}
 

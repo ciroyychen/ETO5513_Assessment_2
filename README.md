@@ -1,29 +1,72 @@
-## ETO5513_Assessment_2: Team project
+## ETO5513_Assessment_2: Team Project
 
-This repository contains a collaborative report for ETO5513 group assessment. The project explores poverty, inequality and economic wellbeing across countries using World Bank Data.
+This repository contains a collaborative report for the ETO5513 group assessment. The project explores poverty, inequality and economic wellbeing across countries using World Bank data.
 
-### Data Source:
-Data is obtained from the World Bank and the Poverty and Inequality Platform(https://pip.worldbank.org/) and the World Bank poverty topic page (https://data.worldbank.org/topic/poverty), using the WDI package in R.
+### Data Source
+
+Data is obtained from the World Bank, the Poverty and Inequality Platform (https://pip.worldbank.org/) and the World Bank poverty topic page (https://data.worldbank.org/topic/poverty), using the WDI package in R.
 
 ### Analysis Sections
+
 1. Levels and Trends: Changes in extreme poverty over time and differences between poverty measures.
 2. Growth and the Poor: Income growth among the bottom 40% compared with the overall population.
 3. Inequality: Relationships between inequality, poverty and income distribution.
 4. Poverty and Wellbeing: Relationships between extreme poverty, life expectancy and GDP per capita.
 
 ### Reproducibility
+
 1. Clone this GitHub repository.
 2. Open the project in RStudio.
-3. Install the required R packages.
-4. Knit the Assessment1.Rmd Markdown file to reproduce the HTML file, print the HTML to PDF.
+3. Install the required R packages, starting with `install.packages("pacman")`.
+4. Ensure the saved datasets are available in the `data` folder.
+5. Knit the `Assessment2.Rmd` file to reproduce the HTML report.
+6. Print or export the HTML report to PDF if required.
+
+An internet connection may be required to install packages and retrieve data for sections that access the World Bank API directly.
 
 ### Collaboration
-Each team member works on an individual Git branch, completed sections are merged into the master branch
+
+Each team member works on an individual Git branch. Completed sections are merged into the master branch.
 
 ### License
-Original project code is released under the MIT License. World bank data is subject to its original licensing terms.
+
+Original project code is released under the MIT License. World Bank data is subject to its original licensing terms.
+
+### Section 1 details: Levels and Trends
+
+**Research questions**
+
+1. How has extreme poverty changed over time, and which regions have progressed fastest?
+2. How do international and national poverty lines differ for the same countries?
+
+**Data.** World Bank World Development Indicators, accessed using the WDI package in R. Indicators retrieved:
+
+| Variable | Indicator | Code |
+|---|---|---|
+| `poverty` | International poverty headcount ratio ($3/day, 2021 PPP) | `SI.POV.DDAY` |
+| `national_poverty` | National poverty headcount ratio | `SI.POV.NAHC` |
+| `poverty_gap` | Poverty gap at the international poverty line | `SI.POV.GAPS` |
+| `gdp_pc` | GDP per capita (current US$) | `NY.GDP.PCAP.CD` |
+| `population` | Total population | `SP.POP.TOTL` |
+
+The dataset contains 6,916 observations and 17 variables covering the period 2000–2025. It is saved in `data/wdi_section1.rds`.
+
+**Methodology.**
+
+- Regional extreme poverty trends are examined between 2002 and 2024.
+- Poverty reductions are calculated in percentage points.
+- Regional aggregates are excluded from country-level comparisons.
+- International and national poverty rates are compared using the latest available matched observation for each country.
+- The ten countries with the largest absolute differences are selected for visualisation.
+
+**Packages.** WDI, dplyr, tidyr, ggplot2 and knitr.
+
+**Reproducibility.** The data retrieval procedure is documented in the `s1-data-source` chunk (`eval = FALSE`) in `Assessment2.Rmd`. The saved RDS file allows Section 1 to be reproduced without downloading the data again. Fresh downloads may differ due to World Bank data revisions.
+
+**Notes.** Missing observations, incomplete regional coverage, different survey years and differences in national poverty definitions limit comparability and generalisability.
 
 ### Section 2 details: Growth and the Poor
+
 **Data.** World Bank World Development Indicators, downloaded with the `WDI` package on 15 November 2026. Indicators used:
 
 | Variable | Indicator | Code |
@@ -33,8 +76,8 @@ Original project code is released under the MIT License. World bank data is subj
 | `b40` | Survey mean consumption or income per capita, bottom 40% (2021 PPP $ per day) | `SI.SPR.PC40` |
 | `gdp_pc` | GDP per capita (current US$) | `NY.GDP.PCAP.CD` |
 
-The cleaned data are saved in `data/wdi_section2.rds` and committed to the repository, so the report knits without an internet connection. The code that created the file is in the `s2_data_source` chunk (`eval = FALSE`) at the end of Section 2 in `Assessment2.Rmd`. If you rebuild it, retry if the World Bank API times out.
+The cleaned data are saved in `data/wdi_section2.rds` and committed to the repository, so Section 2 knits without downloading the dataset again. The code that created the file is in the `s2_data_source` chunk (`eval = FALSE`) at the end of Section 2 in `Assessment2.Rmd`. If you rebuild it, retry if the World Bank API times out.
 
-**Packages.** The setup chunk uses `pacman`, so install it first with `install.packages("pacman")`. `pacman::p_load()` then installs and loads the rest. Knitting to PDF also needs LaTeX, for example `install.packages("tinytex")` then `tinytex::install_tinytex()`.
+**Packages.** The setup chunk uses `pacman`, so install it first with `install.packages("pacman")`. `pacman::p_load()` then installs and loads the rest. Knitting directly to PDF also needs LaTeX, for example `install.packages("tinytex")` then `tinytex::install_tinytex()`.
 
 **Notes.** For each country the analysis uses the most recent survey year with data, so years differ between countries.
