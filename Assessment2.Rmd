@@ -403,7 +403,7 @@ The scatterplot reveals a strong positive correlation: on average, higher inequa
 
 ```{r s3_fig1 Relationship between inequality and poverty}
 
-Section3_data<-read.csv("Data/Section3_data.csv")
+Section3_data<-read.csv("data/Section3_data.csv")
 view(Section3_data)
 
 
