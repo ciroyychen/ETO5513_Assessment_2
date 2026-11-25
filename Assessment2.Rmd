@@ -393,7 +393,35 @@ This section is about inequality and and explores the following questions:
 1. Is higher inequality associated with higher poverty?
 2. How does the income share of the richest 10% compare with the poorest 20% across regions?
 
-#### 3.2 Relationship between inequality and poverty
+#### 3.2 Data Extraction
+
+Data: World Development Indicators [@worldbank2026], downloaded with the WDI package [@arelbundock2026].
+
+```{r s2_data_source, eval=FALSE, echo=FALSE}
+
+#Below is the code used to extract the four indicators used in this section.
+
+Section3_data <-WDI(
+  country = "all",
+  indicator = c(
+    Gini_index = "SI.POV.GINI", #Gini index
+    Income_share_lowest_20 = "SI.DST.FRST.20", #Income share of the bottom 20% of population (20% who earn the lowest income)
+    Income_share_highest_10 = "SI.DST.10TH.10", #Income share of top 10% of population (the 10% who earn the highest income)
+    Percent_pop_4.2 = "SI.POV.LMIC" #Proportion of population living on less than $4.20 per day (adjusted for differences in purchasing power between countries). Referred to in this section as the poverty rate.
+  ),
+  start = 1960, 
+  end = 2024
+)
+
+write.csv(
+  Section3_data,
+  "data/Section3_data.csv",
+  row.names = FALSE
+)
+
+```
+
+#### 3.3 Relationship between inequality and poverty
 
 A common measure of income inequality is the Gini index. A Gini index of 1 represents maximum inequality, while an index of 0 represents perfect equality across a population. [@owid-what-is-the-gini-coefficient] 
 
@@ -442,7 +470,7 @@ India having the lowest Gini index is surprising, given that research has shown 
 
 United Arab Emirates has a low Gini index, and a poverty rate of 0%. While this may, on the surface, indicate low poverty and inequality, the financial exploitation and tough living conditions for migrant workers in this country has been widely reported (@Garret2023). 
 
-Table 1 therefore highlights the importance of considering supplementary information and data limitations when analyzing particular nations; broad indicators alone may not provide a complete picture.
+Table 1 therefore highlights the importance of considering supplementary information and data limitations when analysing particular nations; broad indicators alone may not provide a complete picture.
 
 ```{r s3_tab1 Countries with the lowest Gini index}
 
@@ -462,11 +490,11 @@ digits=2
 
 ```
 
-#### 3.2 Income distribution across regions
+#### 3.4 Income distribution across regions
 
 Figure 3.2 shows the income distribution for Australia against selected countries. In Australia, the top 10% of the population have 26% of the income. This is slightly below the median of 27.34%. The bottom 20% of the population only have 7.3% of the income.
 
-Australia's distribution is broadly similar to other developed countries (United States, United Kingdom) and developing Asian countries (Chine, Indonesia).
+Australia's distribution is broadly similar to other developed countries (United States, United Kingdom) and developing Asian countries (China, Indonesia).
 
 The two outliers are the African countries (South Africa and Namibia), which have much higher rates.
 
@@ -551,7 +579,7 @@ knitr::kable(
   col.names = c(
     "Country",
     "Top 10% income<br>share (%)",
-    "Average Gini<br>coefficient",
+    "Average Gini<br>index",
     "Average poverty<br>rate (%)"
   ),
   caption = "Table 2: Countries with the highest share of income in the top 10% of the population",
@@ -564,8 +592,13 @@ knitr::kable(
 
 ```
 
+#### 3.5 Key findings and limitations
 
+This section has found that there is a strong positive correlation between inequality (as measured by the Gini index) and rate of poverty. Inequality and poverty tend to be highest in developing countries (particularly from Africa), while countries with the lowest inequality were often from Central and Eastern Europe. 
 
+In Australia, the top 10% of the population (highest income earners) receive 26% of all income, just slightly below the international median of 27%.
+
+Data limitations include the differing methodologies and surveys used in each country to obtain the data (such as India's Gini index being based on consumption, rather than income), as well as differing frequencies of data collection resulting in frequent missing data, which in turn required averaging data over a decade (2015 to 2024) to create indicators for analysis in this section.
 
 
 
@@ -732,9 +765,11 @@ The analysis of poverty trends revealed substantial global progress between 2002
 
 The analysis of income growth indicated that the bottom 40% generally kept pace with, and slightly exceeded, income growth for the whole population: the poorest grew faster in 64% of countries, with a median gap of 0.5 percentage points. Progress was uneven, however, and the bottom 40% fell behind in the Middle East, North Africa, Afghanistan and Pakistan, where only 22% of countries saw faster growth for the poorest. Bottom-40% incomes were also strongly associated with GDP per capita (correlation 0.94 on logged values), suggesting that economic development is important but does not guarantee equitable outcomes.
 
+The analysis on inequality found that there is a strong positive correlation between income inequality (as measured by the Gini index) and rate of poverty. Countries with the highest levels of inequality (and poverty) were often from Africa, while countries with the lowest inequality were often from Central and Eastern Europe.   
+
 The wellbeing analysis found a significant negative relationship between extreme poverty and life expectancy, even after accounting for GDP per capita. Although economic development partly explains this relationship, poverty remains associated with lower life expectancy, highlighting the importance of considering broader factors beyond national income when assessing wellbeing.
 
-Several limitations should be acknowledged, including missing observations, inconsistent survey years, differences in national poverty definitions and the inability to establish causal relationships.
+Several limitations should be acknowledged, including missing observations, inconsistent survey years and methodologies, differences in national poverty definitions and the inability to establish causal relationships.
 
 Overall, the findings highlight the importance of combining economic growth with inclusive development policies and improved access to essential services. Monitoring multiple poverty and wellbeing indicators is essential for identifying disadvantaged populations and supporting sustainable and equitable poverty reduction.
 
