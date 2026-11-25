@@ -82,6 +82,26 @@ The cleaned data are saved in `data/wdi_section2.rds` and committed to the repos
 
 **Notes.** For each country the analysis uses the most recent survey year with data, so years differ between countries.
 
+### Section 3 details: Inequality
+
+**Research questions**
+
+1. Is higher inequality associated with higher poverty?
+2. How does the income share of the richest 10% compare with the poorest 20% across regions?
+
+**Data:** World Bank World Development Indicators, accessed using the `WDI` package in R. Indicators retrieved:
+
+| Variable | Indicator | Code |
+|---|---|---|
+| `Gini_index` | Gini index | `SI.POV.GINI` |
+| `Income_share_lowest_20` | Income share held by lowest 20% | `SI.DST.FRST.20` |
+| `Income_share_highest_10` | Income share held by highest 10% | `SI.DST.10TH.10` |
+| `Percent_pop_4.2` | Poverty headcount ratio at $4.20 a day (2021 PPP) (% of population) | `SI.POV.LMIC` |
+
+**Packages.** WDI, dplyr, tidyr, ggplot2 and knitr.
+
+**Notes.** This analysis averages results over a 10-year period (2015 to 2024), to account for cross-country differences in data collection frequencies.
+
 ### Section 4 details: Poverty and Wellbeing
 
 **Research questions**
