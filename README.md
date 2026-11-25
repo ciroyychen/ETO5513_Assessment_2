@@ -81,3 +81,34 @@ The cleaned data are saved in `data/wdi_section2.rds` and committed to the repos
 **Packages.** The setup chunk uses `pacman`, so install it first with `install.packages("pacman")`. `pacman::p_load()` then installs and loads the rest. Knitting directly to PDF also needs LaTeX, for example `install.packages("tinytex")` then `tinytex::install_tinytex()`.
 
 **Notes.** For each country the analysis uses the most recent survey year with data, so years differ between countries.
+
+### Section 4 details: Poverty and Wellbeing
+
+**Research questions**
+
+1. Do countries with higher extreme poverty rates have lower life expectancy?
+2. Does the relationship between poverty and life expectancy remain after accounting for GDP per capita?
+
+**Data:** World Bank World Development Indicators, accessed using the `WDI` package in R. Indicators retrieved:
+
+| Variable | Indicator | Code |
+|---|---|---|
+| `poverty` | International poverty headcount ratio ($3/day, 2021 PPP) | `SI.POV.DDAY` |
+| `life_expectancy` | Life expectancy at birth, total (years) | `SP.DYN.LE00.IN` |
+| `gdp_per_capita` | GDP per capita (current US$) | `NY.GDP.PCAP.CD` |
+
+The dataset covers 2015–2023. After excluding regional aggregates and observations with missing values, the analysis includes 702 country-year observations from 150 countries. The original World Bank data are saved in `data/wdi_section4.rds`.
+
+**Methodology:**
+
+- Regional aggregates and observations with missing values are excluded.
+- GDP per capita is categorised into three groups: low (below US$5,000), middle (US$5,000–19,999) and high (US$20,000 or above).
+- Scatterplots and boxplots are used to examine the relationship between poverty, life expectancy and GDP per capita.
+- Two linear regression models are compared: Model 1 examines the relationship between poverty and life expectancy, while Model 2 adding variable for log GDP per capita.
+- Regression coefficients, statistical significance and adjusted R² are compared to assess the relationships between variables.
+
+**Packages:** WDI, dplyr, ggplot2, kableExtra and knitr.
+
+**Reproducibility:** The data retrieval procedure is included in the `s4-data-source` chunk (`eval = FALSE`) at the end of Section 4 in `Assessment2.Rmd`. The dataset is saved into `data` folder to allows Section 4 to be reproduced without downloading the data again. Results from new downloads may vary due to World bank data updates.
+
+**Notes:** Missing data and uneven country coverage may affect the results. The analysis also excludes other factors influencing life expectancy, such as healthcare and education. The findings represent statistical associations rather than causal relationships.
