@@ -583,8 +583,7 @@ This section examines the relationship between poverty, life expectancy and GDP 
 ```{r data-preparation}
 
 # Set up the data set, end with 2023 as only 26 countries data in 2024 and too many missing values in 2025
-sec4_data <- WDI(country = "all",indicator = c(poverty = "SI.POV.DDAY",life_expectancy = "SP.DYN.LE00.IN",gdp_per_capita = "NY.GDP.PCAP.CD"),
-  start = 2015,end = 2023,extra = TRUE)
+sec4_data <- readRDS("data/wdi_section4.rds")
 
 # Remove regional aggregates and NA values
 sec4_use <- sec4_data|>
