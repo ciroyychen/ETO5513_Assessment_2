@@ -397,7 +397,7 @@ This section is about inequality and and explores the following questions:
 
 Data: World Development Indicators [@worldbank2026], downloaded with the WDI package [@arelbundock2026].
 
-```{r s2_data_source, eval=FALSE, echo=FALSE}
+```{r s3_data_source, eval=FALSE, echo=FALSE}
 
 #Below is the code used to extract the four indicators used in this section.
 
@@ -737,7 +737,7 @@ kable(sec4_regression,row.names = FALSE,align = c("l", "r", "r"),format = "html"
 
 In Model 1, poverty is significantly negatively associated with life expectancy (β = −0.336, p < 0.001). After controlling for log GDP per capita in Model 2, the poverty coefficient decreases in magnitude to −0.131 but remains statistically significant (p < 0.001). Meanwhile, log GDP per capita shows a significant positive association with life expectancy (β = 3.402, p < 0.001). The increase in adjusted R² from 0.520 to 0.784 indicates that Model 2 fits the data better and explains more variation in life expectancy.
 
-#### 4.4 Key findings and limitations
+#### 4.5 Key findings and limitations
 
 The findings in this section suggest that higher extreme poverty is associated with lower life expectancy, even after accounting for GDP per capita. The weaker poverty coefficient in Model 2 suggests that economic development may partly explain this relationship. The research [@yu2026] also highlights the complex relationship between poverty, economic development and population health.
 
