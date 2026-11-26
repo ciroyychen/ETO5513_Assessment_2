@@ -397,7 +397,7 @@ This section is about inequality and and explores the following questions:
 
 Data: World Development Indicators [@worldbank2026], downloaded with the WDI package [@arelbundock2026].
 
-```{r s2_data_source, eval=FALSE, echo=FALSE}
+```{r s3_data_source, eval=FALSE, echo=FALSE}
 
 #Below is the code used to extract the four indicators used in this section.
 
